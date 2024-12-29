@@ -9,7 +9,6 @@ body{
     background-repeat: no-repeat;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
     font-family: "Montserrat", sans-serif; 
     gap: 1rem;
@@ -18,9 +17,24 @@ body{
     height: 100vh;
     color: rgb(255, 255, 255);
 }
+nav{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 1rem;
+    gap: 2rem;
+}
+nav a{
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+}
+nav a:hover{
+    color: #2275EC;
+}
 h1{
-    top: 3rem;
-    position: absolute;
+    margin-top: 1rem;
+    
 }
 
 img{
@@ -55,6 +69,8 @@ footer{
     width: 100vw;
     height: 10rem;
 }
-footer img{
+footer a{
     width: 50px;
+    height: 50px;
+    background-image: url(./img/logo.png);
 }
