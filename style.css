@@ -4,7 +4,7 @@
 }
 
 body{
-    background-image: url(./img/bg.jpg);
+    background-image: url(./img/background.png);
     background-size: cover;
     background-repeat: no-repeat;
     display: flex;
@@ -42,8 +42,8 @@ img{
     cursor: pointer;
 }
 input{
-    background-color: #38B4FD;
-    color: black;
+    background-color: #0186E4;
+    color: rgba(31, 31, 31, 0.897);
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -54,7 +54,7 @@ input{
 
 }
 input:hover{
-    background-color: #2275EC ;
+    background-color: #152840 ;
     color: aliceblue;
 }
 footer{
