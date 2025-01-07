@@ -41,7 +41,7 @@ img{
     width: 20rem;
     
 }
-input{
+.botao{
     background-color: #0186E4;
     color: rgba(0, 0, 0, 0.897);
     border: none;
@@ -51,9 +51,10 @@ input{
     padding-left: 1rem;
     padding-right: 1rem;
     transition-duration: 300ms;
+    margin-top: 2rem;
 
 }
-input:hover{
+.botao:hover{
     background-color: #152840 ;
     color: aliceblue;
 }
@@ -76,4 +77,11 @@ footer a{
     background-image: url(./img/new-logo.png);
     background-size: cover;
 
+}
+/* Pagina cadastro */
+form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
 }
