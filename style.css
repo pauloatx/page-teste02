@@ -85,3 +85,8 @@ form{
     align-items: center;
     
 }
+/* Pagina Sobre */
+p{
+    width: 80vw;
+    margin-top: 2rem;
+}
