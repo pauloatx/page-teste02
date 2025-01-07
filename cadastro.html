@@ -19,16 +19,21 @@
         <a href="cadastro.html">Cadastro</a>
         <a href="sobre.html">Sobre</a>
     </nav>
-    <h1>Cadastro</h1>
-    <form action="cadastrado.html" method="get">
-        <label for="email">E-mail</label>
-        <input type="email" name="email" id="email"required><br>
-        <label for="username">Nome de usuário</label>
-        <input type="text" name="username" id="username" required><br>
-        <label for="password">Senha</label>
-        <input type="text" name="password" id="password" required>
-        <button class="botao" type="submit">Cadastrar</button>
-    </form>
+    <div class="form-box">
+        <form class="form">
+            <span class="title">Cadastrar</span>
+            <span class="subtitle">Crie sua conta.</span>
+            <div class="form-container">
+              <input required type="text" class="input" placeholder="Seu nome">
+                    <input required type="email" class="input" placeholder="Email">
+                    <input required type="password" class="input" placeholder="Senha">
+            </div>
+            <button>Cadastrar</button>
+        </form>
+        <div class="form-section">
+          <p>Já tem uma conta? <a href="">Log in</a> </p>
+        </div>
+        </div>
     <footer>
         <a href="index.html"></a>
         <span> copyright &copy; 2024 ATX Solution. Todos os direitos reservados.</span>
