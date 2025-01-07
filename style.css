@@ -82,6 +82,7 @@ footer a{
 .form-box {
     max-width: 300px;
     background: #f1f7fe;
+    border: 1px solid #0BF9F6;
     overflow: hidden;
     border-radius: 16px;
     color: #010101;
@@ -147,7 +148,7 @@ footer a{
   
   /*Button*/
   .form button {
-    background-color: #0186E4;
+    background-color: 0FE6F1;
     color: #fff;
     border: 0;
     border-radius: 5px;
