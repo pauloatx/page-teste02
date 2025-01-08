@@ -29,7 +29,7 @@ nav a{
     font-weight: 600;
 }
 nav a:hover{
-    color: #2275EC;
+    color: #0cccc2;
 }
 h1{
     margin-top: 1rem;
@@ -78,11 +78,11 @@ footer a{
 
 }
 /* Pagina cadastro */
-/* From Uiverse.io by alexruix */ 
+/* caixa de formulario */ 
 .form-box {
     max-width: 300px;
-    background: #f1f7fe;
-    border: 1px solid #0BF9F6;
+    background: #00121B;
+    border: 1px solid #025652;
     overflow: hidden;
     border-radius: 16px;
     color: #010101;
@@ -97,22 +97,23 @@ footer a{
     text-align: center;
   }
   
-  /*Form text*/
+  /*Formulario texto*/
   .title {
     font-weight: bold;
     font-size: 1.6rem;
+    color: #faf7f7;
   }
   
   .subtitle {
     font-size: 1rem;
-    color: #666;
+    color: #faf7f7;
   }
   
-  /*Inputs box*/
+  /*coixa de imputs*/
   .form-container {
     overflow: hidden;
     border-radius: 8px;
-    background-color: #fff;
+    background-color: #01313D;
     margin: 1rem 0 .5rem;
     width: 100%;
   }
@@ -123,7 +124,7 @@ footer a{
     outline: 0;
     height: 40px;
     width: 100%;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #161212;
     font-size: .9rem;
     padding: 8px 15px;
   }
@@ -131,25 +132,25 @@ footer a{
   .form-section {
     padding: 16px;
     font-size: .85rem;
-    background-color: #e0ecfb;
-    box-shadow: rgb(0 0 0 / 8%) 0 -1px;
+    background-color: #00121B;
+    box-shadow: rgba(119, 11, 11, 0.08) 0 -1px;
   }
   
   .form-section a {
     font-weight: bold;
-    color: #0066ff;
+    color: #0cccc2;
     transition: color .3s ease;
   }
   
   .form-section a:hover {
-    color: #005ce6;
+    color: ##025652;
     text-decoration: underline;
   }
   
-  /*Button*/
+  /*botão*/
   .form button {
-    background-color: 0FE6F1;
-    color: #fff;
+    background-color: #025652;
+    color: #fcf6f6;
     border: 0;
     border-radius: 5px;
     padding: 10px 16px;
@@ -160,11 +161,13 @@ footer a{
   }
   
   .form button:hover {
-    background-color: #152840;
+    background-color:  #01313D;
   }
 
 /* Pagina Sobre */
 p{
     width: 80vw;
     margin-top: 2rem;
+    color: #fff;
+
 }
