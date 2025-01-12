@@ -15,6 +15,9 @@ body{
     width: 100vw;
     height: 100vh;
     color: rgb(255, 255, 255);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
 }
 nav{
     display: flex;
@@ -37,8 +40,67 @@ h1{
 }
 
 img{
-    width: 20rem;
+    width: 10rem;
+    margin-top: 3rem;
     
+}
+.banners{
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  font-size: 1.3rem;
+}
+.web{
+  width: 200px;
+  height: 200px;
+  display: inline-block;
+  background-image: url(./img/web.jpg);
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  color: white;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  font-weight: 600;
+  text-shadow:  -1px -1px 0 black,1px -1px 0 black,-1px  1px 0 black, 1px  1px 0 black,0px -1px 0 black, 0px  1px 0 black, -1px  0px 0 black, 1px  0px 0 black;
+}
+.mobile{
+  width: 200px;
+  height: 200px;
+  display: inline-block;
+  background-image: url(./img/mobile.jpg);
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  color: white;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  font-weight: 600;
+  text-shadow:  -1px -1px 0 black,1px -1px 0 black,-1px  1px 0 black, 1px  1px 0 black,0px -1px 0 black, 0px  1px 0 black, -1px  0px 0 black, 1px  0px 0 black;
+}
+.dados{
+  width: 200px;
+  height: 200px;
+  display: inline-block;
+  background-image: url(./img/dados.jpg);
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+    color: white;
+    border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  font-weight: 600;
+  text-shadow:  -1px -1px 0 black,1px -1px 0 black,-1px  1px 0 black, 1px  1px 0 black,0px -1px 0 black, 0px  1px 0 black, -1px  0px 0 black, 1px  0px 0 black;
+  text-align: center;
 }
 .botao{
     background-color: #0186E4;
@@ -58,16 +120,15 @@ img{
     color: aliceblue;
 }
 footer{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2rem;
-    position: absolute;
-    bottom: 0;
-    background-color: rgb(0, 0, 0);
-    width: 100vw;
-    height: 10rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  background-color: rgb(0, 0, 0);
+  width: 100%;
+  height: 10rem;
+  margin-top: auto; 
 }
 footer a{
     width: 40px;
@@ -143,7 +204,7 @@ footer a{
   }
   
   .form-section a:hover {
-    color: ##025652;
+    color: #025652;
     text-decoration: underline;
   }
   
