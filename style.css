@@ -1,16 +1,10 @@
+/* Reset e estilos gerais */
 * {
   padding: 0;
   margin: 0;
 }
 
-html {
-  scroll-behavior: smooth;
-  overflow-x: hidden;
-}
-
 body {
-  backface-visibility: hidden;
-  -webkit-font-smoothing: antialiased;
   background-image: url(./img/background.png);
   background-size: cover;
   background-repeat: no-repeat;
@@ -19,7 +13,6 @@ body {
   flex-direction: column;
   align-items: center;
   font-family: "Montserrat", sans-serif;
-  
   width: 100vw;
   height: 100vh;
   color: rgb(255, 255, 255);
@@ -48,26 +41,27 @@ nav a:hover {
 
 h1 {
   margin-top: 1rem;
-
 }
 
 img {
   width: 10rem;
   margin-top: 3rem;
-
 }
 
-.conteudo{
+.conteudo {
+  width: 50vw;
+}
+.sobre {
   width: 80vw;
+    margin-top: 2rem;
+    color: #fff;
 }
-
 footer {
   text-align: center;
   margin-top: 30px;
   padding: 10px;
   background-color: #f1f1f1;
 }
-
 
 .banners {
   display: flex;
@@ -76,60 +70,25 @@ footer {
   font-size: 1.3rem;
 }
 
-.web {
+.web, .mobile, .dados {
   width: 200px;
   height: 200px;
-  display: inline-block;
-  background-image: url(./img/web.jpg);
-  background-size: cover;
-  background-position: center;
-  cursor: pointer;
-  color: white;
-  border-radius: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
+  color: white;
+  border-radius: 5px;
   text-decoration: none;
   font-weight: 600;
-  text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black, 0px -1px 0 black, 0px 1px 0 black, -1px 0px 0 black, 1px 0px 0 black;
+  text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+  background-size: cover;
+  background-position: center;
 }
 
-.mobile {
-  width: 200px;
-  height: 200px;
-  display: inline-block;
-  background-image: url(./img/mobile.jpg);
-  background-size: cover;
-  background-position: center;
-  cursor: pointer;
-  color: white;
-  border-radius: 5px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-decoration: none;
-  font-weight: 600;
-  text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black, 0px -1px 0 black, 0px 1px 0 black, -1px 0px 0 black, 1px 0px 0 black;
-}
-
-.dados {
-  width: 200px;
-  height: 200px;
-  display: inline-block;
-  background-image: url(./img/dados.jpg);
-  background-size: cover;
-  background-position: center;
-  cursor: pointer;
-  color: white;
-  border-radius: 5px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-decoration: none;
-  font-weight: 600;
-  text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black, 0px -1px 0 black, 0px 1px 0 black, -1px 0px 0 black, 1px 0px 0 black;
-  text-align: center;
-}
+.web { background-image: url(./img/web.jpg); }
+.mobile { background-image: url(./img/mobile.jpg); }
+.dados { background-image: url(./img/dados.jpg); }
 
 .botao {
   background-color: #0186E4;
@@ -137,12 +96,9 @@ footer {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  padding: 0.5rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  transition-duration: 300ms;
+  padding: 0.5rem 1rem;
+  transition: background-color 300ms;
   margin-top: 2rem;
-
 }
 
 .botao:hover {
@@ -168,18 +124,15 @@ footer a {
   cursor: pointer;
   background-image: url(./img/new-logo.png);
   background-size: cover;
-
 }
 
-/* Pagina cadastro */
-/* caixa de formulario */
+/* Página Cadastro */
 .form-box {
   max-width: 300px;
   background: #00121B;
   border: 1px solid #025652;
   overflow: hidden;
   border-radius: 5px;
-  color: #010101;
 }
 
 .form {
@@ -191,22 +144,20 @@ footer a {
   text-align: center;
 }
 
-/*Formulario texto*/
+.title, .subtitle {
+  color: #faf7f7;
+}
+
 .title {
   font-weight: bold;
   font-size: 1.6rem;
-  color: #faf7f7;
 }
 
 .subtitle {
   font-size: 1rem;
-  color: #faf7f7;
 }
 
-/*coixa de imputs*/
 .form-container {
-  overflow: hidden;
-  border-radius: 5px;
   background-color: #01313D;
   margin: 1rem 0 .5rem;
   width: 100%;
@@ -223,25 +174,6 @@ footer a {
   padding: 8px 15px;
 }
 
-.form-section {
-  padding: 16px;
-  font-size: .85rem;
-  background-color: #00121B;
-  box-shadow: rgba(119, 11, 11, 0.08) 0 -1px;
-}
-
-.form-section a {
-  font-weight: bold;
-  color: #0cccc2;
-  transition: color .3s ease;
-}
-
-.form-section a:hover {
-  color: #025652;
-  text-decoration: underline;
-}
-
-/*botão*/
 .form button {
   background-color: #025652;
   color: #fcf6f6;
@@ -258,13 +190,6 @@ footer a {
   background-color: #01313D;
 }
 
-/* Pagina Sobre */
-.sobre p {
-  width: 80vw;
-  margin-top: 1rem;
-  color: #fff;
-
-}
 /* Animations */
 @keyframes slideIn {
   from {
@@ -317,3 +242,8 @@ footer a {
 [data-animate="scale"] {
   animation: scaleUp var(--animation-timing, 1s) ease-out forwards;
 }
+
+/* Delays */
+[data-delay="100"] { animation-delay: 100ms }
+[data-delay="200"] { animation-delay: 200ms }
+[data-delay="300"] { animation-delay: 300ms }
