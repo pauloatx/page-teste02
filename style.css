@@ -12,7 +12,7 @@ body {
   flex-direction: column;
   align-items: center;
   font-family: "Montserrat", sans-serif;
-  gap: 1rem;
+  
   width: 100vw;
   height: 100vh;
   color: rgb(255, 255, 255);
@@ -49,6 +49,18 @@ img {
   margin-top: 3rem;
 
 }
+
+.conteudo{
+  width: 80vw;
+}
+
+footer {
+  text-align: center;
+  margin-top: 30px;
+  padding: 10px;
+  background-color: #f1f1f1;
+}
+
 
 .banners {
   display: flex;
@@ -240,9 +252,19 @@ footer a {
 }
 
 /* Pagina Sobre */
-p {
+.sobre p {
   width: 80vw;
-  margin-top: 2rem;
+  margin-top: 1rem;
   color: #fff;
 
+}
+.contweb, .contmobile, .contdados {
+  opacity: 0;
+  transform: translateY(20px); /* Inicialmente, deslocado para baixo */
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out; /* Transição suave */
+}
+
+.contweb.apareceu, .contmobile.apareceu, .contdados.apareceu {
+  opacity: 1; /* Fica visível */
+  transform: translateY(0); /* Volta à posição original */
 }
