@@ -1,18 +1,33 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const elementos = document.querySelectorAll(".contweb, .contmobile, .contdados");
-
-    const observer = new IntersectionObserver((entradas, observer) => {
-        entradas.forEach(entrada => {
-            if (entrada.isIntersecting) {
-                entrada.target.classList.add("apareceu"); // Adiciona a classe quando o elemento estiver visível
-                observer.unobserve(entrada.target); // Para de observar o elemento após ele aparecer
-            }
+document.addEventListener('DOMContentLoaded', () => {
+    const animateOnScroll = (elements) => {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    const element = entry.target;
+                    // Aplica os parâmetros da animação
+                    element.style.animationDelay = element.dataset.delay || '0ms';
+                    element.style.animationDuration = element.dataset.timing || '1s';
+                    
+                    // Força o recálculo do layout para disparar a animação
+                    void element.offsetWidth;
+                    
+                    // Adiciona a classe que ativa a animação
+                    element.classList.add('animate-active');
+                    
+                    // Para de observar após a ativação
+                    observer.unobserve(element);
+                }
+            });
+        }, {
+            threshold: 0.2,
+            rootMargin: '0px 0px -50px 0px'
         });
-    }, {
-        threshold: 0.5  // O elemento precisa estar 50% visível
-    });
 
-    elementos.forEach(elemento => {
-        observer.observe(elemento); // Observa os elementos
-    });
+        elements.forEach(element => {
+            observer.observe(element);
+        });
+    };
+
+    const animatedElements = document.querySelectorAll('[data-animate]');
+    animateOnScroll(animatedElements);
 });

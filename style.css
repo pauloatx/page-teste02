@@ -258,13 +258,55 @@ footer a {
   color: #fff;
 
 }
-.contweb, .contmobile, .contdados {
-  opacity: 0;
-  transform: translateY(20px); /* Inicialmente, deslocado para baixo */
-  transition: opacity 0.5s ease-out, transform 0.5s ease-out; /* Transição suave */
+/* Animations */
+@keyframes slideIn {
+  from {
+      opacity: 0;
+      transform: translateY(50px) rotateX(30deg);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0) rotateX(0);
+  }
 }
 
-.contweb.apareceu, .contmobile.apareceu, .contdados.apareceu {
-  opacity: 1; /* Fica visível */
-  transform: translateY(0); /* Volta à posição original */
+@keyframes fadeLeft {
+  from {
+      opacity: 0;
+      transform: translateX(100px) skewX(-10deg);
+  }
+  to {
+      opacity: 1;
+      transform: translateX(0) skewX(0);
+  }
+}
+
+@keyframes scaleUp {
+  from {
+      opacity: 0;
+      transform: scale(0.8) rotate(5deg);
+  }
+  to {
+      opacity: 1;
+      transform: scale(1) rotate(0);
+  }
+}
+
+/* Classes base */
+[data-animate] {
+  opacity: 0;
+  animation-fill-mode: forwards !important; /* Mantém o estado final */
+  will-change: transform, opacity;
+}
+
+[data-animate="slide"] {
+  animation: slideIn var(--animation-timing, 1s) ease-out forwards;
+}
+
+[data-animate="fade-left"] {
+  animation: fadeLeft var(--animation-timing, 1.2s) ease-out forwards;
+}
+
+[data-animate="scale"] {
+  animation: scaleUp var(--animation-timing, 1s) ease-out forwards;
 }
