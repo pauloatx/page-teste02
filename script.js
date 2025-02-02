@@ -2,20 +2,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const animateOnScroll = (elements) => {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
+                const element = entry.target;
+                
                 if(entry.isIntersecting) {
-                    const element = entry.target;
-                    // Aplica os parâmetros da animação
+                    // Prepara a animação
                     element.style.animationDelay = element.dataset.delay || '0ms';
                     element.style.animationDuration = element.dataset.timing || '1s';
                     
-                    // Força o recálculo do layout para disparar a animação
-                    void element.offsetWidth;
-                    
-                    // Adiciona a classe que ativa a animação
+                    // Reinicia a animação
+                    element.classList.remove('animate-active');
+                    void element.offsetWidth; // Força recálculo do layout
                     element.classList.add('animate-active');
-                    
-                    // Para de observar após a ativação
-                    observer.unobserve(element);
+                } else {
+                    // Reseta o estado para permitir nova animação
+                    element.classList.remove('animate-active');
                 }
             });
         }, {

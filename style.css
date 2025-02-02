@@ -3,7 +3,14 @@
   margin: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
 body {
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
   background-image: url(./img/background.png);
   background-size: cover;
   background-repeat: no-repeat;
