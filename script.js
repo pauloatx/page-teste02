@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
         try {
-            const resposta = await fetch("http://localhost:3000/api/atendimentos", {
+            const resposta = await fetch("https://seu-app.onrender.com/api/atendimentos", { // URL ATUALIZADA PARA RENDERER
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
