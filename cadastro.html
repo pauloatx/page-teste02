@@ -20,25 +20,34 @@
         <a href="cadastro.html">Cadastro</a>
         <a href="sobre.html">Sobre</a>
     </nav>
-    <div class="form-box">
-        <form action="cadastrado.html" method="get" class="form">
-            <span class="title">Cadastrar</span>
-            <span class="subtitle">Crie sua conta.</span>
-            <div class="form-container">
-                <input required type="text" class="input" placeholder="Seu nome">
-                <input required type="email" class="input" placeholder="Email">
-                <input required type="password" class="input" placeholder="Senha">
-            </div>
-            <button>Cadastrar</button>
-        </form>
-        <div class="form-section">
-            <p>Já tem uma conta? <a href="">Log in</a> </p>
-        </div>
-    </div>
+    <h2>Cadastro de Atendimento</h2>
+    <form class="form-box form-container form" id="cadastro-form" action="cadastrado.html">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" required><br>
+    
+        <label for="email">Email:</label>
+        <input type="email" id="email" required><br>
+    
+        <label for="telefone">Telefone:</label>
+        <input type="text" id="telefone"><br>
+    
+        <label for="descricao_servico">Descrição do Serviço:</label>
+        <textarea id="descricao_servico" required rows="4" cols="50"></textarea><br>
+    
+        <label for="data_servico">Data do Serviço:</label>
+        <input type="date" id="data_servico"><br>
+    
+        <button type="submit">Cadastrar Atendimento</button>
+    </form>
+    
+    <p id="mensagem"></p>
+    
+    
     <footer>
         <a href="index.html"></a>
         <span> copyright &copy; 2024 ATX Solution. Todos os direitos reservados.</span>
     </footer>
+    <script src="script.js"></script>
 </body>
 
 </html>

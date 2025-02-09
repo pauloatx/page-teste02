@@ -30,3 +30,52 @@ document.addEventListener('DOMContentLoaded', () => {
     const animatedElements = document.querySelectorAll('[data-animate]');
     animateOnScroll(animatedElements);
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("cadastro-form");
+    const mensagem = document.getElementById("mensagem");
+
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault(); // Evita recarregar a página
+
+        const nome = document.getElementById("nome").value;
+        const email = document.getElementById("email").value;
+        const telefone = document.getElementById("telefone").value;
+        const descricao_servico = document.getElementById("descricao_servico").value;
+        const data_servico = document.getElementById("data_servico").value;
+
+        const dados = {
+            nome,
+            email,
+            telefone,
+            descricao_servico,
+            data_servico
+        };
+
+        try {
+            const resposta = await fetch("http://localhost:3000/api/atendimentos", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(dados),
+            });
+
+            const resultado = await resposta.json();
+
+            if (resposta.ok) {
+                mensagem.textContent = "Atendimento cadastrado com sucesso!";
+                mensagem.style.color = "green";
+                form.reset();
+            } else {
+                mensagem.textContent = resultado.errors ? resultado.errors.map(err => err.msg).join(", ") : "Erro ao cadastrar.";
+                mensagem.style.color = "red";
+            }
+        } catch (erro) {
+            console.error("Erro ao enviar requisição:", erro);
+            mensagem.textContent = "Erro ao conectar ao servidor.";
+            mensagem.style.color = "red";
+        }
+    });
+});
+

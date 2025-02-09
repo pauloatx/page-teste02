@@ -128,68 +128,72 @@ footer a {
 }
 
 /* Página Cadastro */
-.form-box {
-  max-width: 300px;
-  background: #00121B;
-  border: 1px solid #025652;
-  overflow: hidden;
-  border-radius: 5px;
+/* Estilos específicos para o formulário de cadastro */
+#cadastro-form {
+  background: rgba(0, 0, 0, 0.7); /* Fundo semitransparente para destacar o formulário */
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  width: 90%;
+  max-width: 500px;
+  margin: 2rem auto; /* Centraliza o formulário horizontalmente */
 }
 
-.form {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  padding: 32px 24px 24px;
-  gap: 16px;
-  text-align: center;
-}
-
-.title, .subtitle {
-  color: #faf7f7;
-}
-
-.title {
-  font-weight: bold;
-  font-size: 1.6rem;
-}
-
-.subtitle {
-  font-size: 1rem;
-}
-
-.form-container {
-  background-color: #01313D;
-  margin: 1rem 0 .5rem;
-  width: 100%;
-}
-
-.input {
-  background: none;
-  border: 0;
-  outline: 0;
-  height: 40px;
-  width: 100%;
-  border-bottom: 1px solid #161212;
-  font-size: .9rem;
-  padding: 8px 15px;
-}
-
-.form button {
-  background-color: #025652;
-  color: #fcf6f6;
-  border: 0;
-  border-radius: 5px;
-  padding: 10px 16px;
-  font-size: 1rem;
+#cadastro-form label {
+  display: block;
+  margin-bottom: 0.5rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: background-color .3s ease;
 }
 
-.form button:hover {
-  background-color: #01313D;
+#cadastro-form input {
+  width: 97%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #0cccc2;
+  border-radius: 4px;
 }
+
+#cadastro-form input:focus {
+  outline: none;
+  box-shadow: 0 0 5px #0cccc2;
+}
+
+#cadastro-form button {
+  width: 503px;
+  padding: 0.75rem;
+  background-color: #0cccc2;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  color: #fff;
+}
+
+#cadastro-form button:hover {
+  background-color: #007973;
+}
+#descricao_servico{
+
+  height: 5rem;
+}
+#cadastro-form textarea {
+  width: 100%;
+  max-width: 490px;
+  min-width: 490px;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: none;
+  border-radius: 4px;
+}
+
+#cadastro-form textarea:focus {
+  outline: none;
+  box-shadow: 0 0 5px #0cccc2;
+}
+
+
 
 /* Animations */
 @keyframes slideIn {
