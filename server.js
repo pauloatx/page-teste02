@@ -50,6 +50,7 @@ async function init() {
     ssl: DB_USE_SSL === 'true' ? { rejectUnauthorized: true } : undefined,
   });
 
+  // Para o MySQL 8.0.41, usamos DEFAULT (CURRENT_DATE) para colunas do tipo DATE
   await pool.execute(`
     CREATE TABLE IF NOT EXISTS atendimentos (
       id INT PRIMARY KEY AUTO_INCREMENT,
@@ -57,7 +58,7 @@ async function init() {
       email VARCHAR(255) NOT NULL,
       telefone VARCHAR(50),
       descricao_servico TEXT NOT NULL,
-      data_servico DATE DEFAULT CURRENT_DATE
+      data_servico DATE DEFAULT (CURRENT_DATE)
     )
   `);
 
