@@ -1,106 +1,125 @@
 require('dotenv').config();
+
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
-const Database = require('better-sqlite3');
+const mysql = require('mysql2/promise');
 const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Configuração de segurança
+// Configurar o trust proxy para funcionar corretamente no Render
+app.set('trust proxy', 1);
+
+// Middleware de segurança e parsing
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // Para aceitar formulários
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Rate limiting
+// Rate limiting para evitar abuso
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, 
-    max: 100
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 app.use(limiter);
 
-// Banco de dados SQLite
-const db = new Database('./banco.db', { verbose: console.log });
+// Verifica se as variáveis de ambiente essenciais estão definidas
+const { DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE, DB_PORT, DB_USE_SSL } = process.env;
+if (!DB_HOST || !DB_USER || !DB_PASSWORD || !DB_DATABASE) {
+  console.error("Erro: Variáveis de ambiente do banco de dados não configuradas corretamente.");
+  process.exit(1);
+}
 
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+async function init() {
+  const pool = mysql.createPool({
+    host: DB_HOST,
+    user: DB_USER,
+    password: DB_PASSWORD,
+    database: DB_DATABASE,
+    port: DB_PORT || 3306,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    ssl: DB_USE_SSL === 'true' ? { rejectUnauthorized: true } : undefined,
+  });
 
-// Criação da tabela
-db.exec(`
+  await pool.execute(`
     CREATE TABLE IF NOT EXISTS atendimentos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        email TEXT NOT NULL,
-        telefone TEXT,
-        descricao_servico TEXT NOT NULL,
-        data_servico TEXT DEFAULT (DATE('now'))
-    );
-`);
+      id INT PRIMARY KEY AUTO_INCREMENT,
+      nome VARCHAR(255) NOT NULL,
+      email VARCHAR(255) NOT NULL,
+      telefone VARCHAR(50),
+      descricao_servico TEXT NOT NULL,
+      data_servico DATE DEFAULT CURRENT_DATE
+    )
+  `);
 
-// Middleware de validação
-const validateAtendimento = [
+  const validateAtendimento = [
     body('nome').trim().isLength({ min: 3 }).withMessage('Nome deve ter pelo menos 3 caracteres').escape(),
     body('email').isEmail().withMessage('E-mail inválido').normalizeEmail(),
-    body('descricao_servico').trim().isLength({ min: 5 }).withMessage('Descrição deve ter pelo menos 5 caracteres').escape(),
-];
+    body('descricao_servico').trim().isLength({ min: 5 }).withMessage('Descrição deve ter pelo menos 5 caracteres').escape()
+  ];
 
-// Rota para cadastrar atendimentos
-app.post('/api/atendimentos', validateAtendimento, (req, res) => {
+  app.post('/api/atendimentos', validateAtendimento, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ errors: errors.array() });
     }
 
     const { nome, email, telefone, descricao_servico, data_servico } = req.body;
     try {
-        const stmt = db.prepare(`
-            INSERT INTO atendimentos (nome, email, telefone, descricao_servico, data_servico)
-            VALUES (?, ?, ?, ?, COALESCE(?, DATE('now')))
-        `);
-        const info = stmt.run(nome, email, telefone, descricao_servico, data_servico);
-        res.status(201).json({
-            id: info.lastInsertRowid,
-            nome,
-            email,
-            telefone,
-            descricao_servico,
-            data_servico: data_servico || new Date().toISOString().split('T')[0]
-        });
-    } catch (err) {
-        handleDatabaseError(err, res);
-    }
-});
+      const [result] = await pool.execute(
+        `INSERT INTO atendimentos (nome, email, telefone, descricao_servico, data_servico) VALUES (?, ?, ?, ?, COALESCE(?, CURRENT_DATE))`,
+        [nome, email, telefone, descricao_servico, data_servico]
+      );
 
-// Rota para listar atendimentos
-app.get('/api/atendimentos', (req, res) => {
+      res.status(201).json({ id: result.insertId, nome, email, telefone, descricao_servico, data_servico: data_servico || new Date().toISOString().split('T')[0] });
+    } catch (err) {
+      console.error('Erro no banco de dados:', err);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  app.get('/api/atendimentos', async (req, res) => {
     try {
-        const atendimentos = db.prepare('SELECT * FROM atendimentos').all();
-        res.json(atendimentos);
+      const [atendimentos] = await pool.query('SELECT * FROM atendimentos');
+      res.json(atendimentos);
     } catch (err) {
-        handleDatabaseError(err, res);
+      console.error('Erro ao buscar atendimentos:', err);
+      res.status(500).json({ error: 'Erro ao buscar atendimentos' });
     }
-});
+  });
 
-// Manipulação de erros do banco de dados
-function handleDatabaseError(err, res) {
-    console.error(err);
-    if (err.code === 'SQLITE_CONSTRAINT') {
-        return res.status(409).json({ error: 'Violação de restrição única' });
-    }
-    res.status(500).json({ error: 'Erro interno do servidor' });
+  app.get('/cadastro', (req, res) => {
+    res.sendFile(path.join(__dirname, 'cadastro.html'));
+  });
+
+  app.get('/', (req, res) => {
+    res.send('Servidor funcionando no Render!');
+  });
+
+  app.listen(port, () => {
+    console.log(`Servidor rodando na porta ${port}`);
+  });
 }
 
-// Servir a página de cadastro
-app.get('/cadastro', (req, res) => {
-    res.sendFile(path.join(__dirname, 'cadastro.html'));
+process.on('uncaughtException', (err) => {
+  console.error('Erro inesperado:', err);
+  process.exit(1);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('Rejeição não tratada:', reason);
+  process.exit(1);
 });
 
-app.listen(port, () => {
-    console.log(`Servidor rodando em http://localhost:${port}`);
+init().catch(err => {
+  console.error('Erro ao iniciar o servidor:', err);
+  process.exit(1);
 });
-
