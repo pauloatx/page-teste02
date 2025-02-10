@@ -1,155 +1,216 @@
 require('dotenv').config();
-
+require('express-async-errors'); // Captura erros assíncronos automaticamente
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
-const mysql = require('mysql2/promise');
+const compression = require('compression');
+const { Pool } = require('pg');
 const path = require('path');
 const fs = require('fs');
+const morgan = require('morgan');
+const hpp = require('hpp');
+const xss = require('xss-clean');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Configura o trust proxy para ambientes que usam proxy reverso
-app.set('trust proxy', 1);
+// Validação das variáveis essenciais
+const requiredEnv = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_DATABASE'];
+const missingEnv = requiredEnv.filter((key) => !process.env[key]);
+if (missingEnv.length) {
+  console.error(`⚠️ Variáveis de ambiente faltantes: ${missingEnv.join(', ')}`);
+  process.exit(1);
+}
 
-// Middlewares para segurança, CORS e parsing de corpo da requisição
-app.use(helmet());
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Configurações de segurança com Helmet e CSP básico
+app.set('trust proxy', 1);
+app.use(helmet({
+  hidePoweredBy: true,
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: [],
+    }
+  }
+}));
+app.disable('x-powered-by'); // Reduz fingerprinting :contentReference[oaicite:3]{index=3}
+
+// Configuração do CORS
+app.use(cors({ origin: process.env.ALLOWED_ORIGINS || '*' }));
+
+// Limitação do tamanho do corpo e compressão
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(compression());
+
+// Proteções adicionais contra ataques
+app.use(hpp());
+app.use(xss());
+
+// Registro de requisições com Morgan
+app.use(morgan('combined'));
+
+// Servir arquivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Configuração do rate limiting para prevenir abusos
+// Rate Limiting para mitigar ataques DOS :contentReference[oaicite:4]{index=4}
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // máximo de 100 requisições por janela
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: 'Muitas requisições. Tente novamente mais tarde.',
   standardHeaders: true,
   legacyHeaders: false,
 });
 app.use(limiter);
 
-// Recupera as variáveis de ambiente para conexão com o banco
+// Configuração do banco de dados
 const { DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE, DB_PORT, DB_USE_SSL } = process.env;
-if (!DB_HOST || !DB_USER || !DB_PASSWORD || !DB_DATABASE) {
-  console.warn("⚠️ Atenção: Variáveis de ambiente do banco de dados não estão definidas corretamente.");
+const poolConfig = {
+  host: DB_HOST,
+  user: DB_USER,
+  password: DB_PASSWORD,
+  database: DB_DATABASE,
+  port: DB_PORT || 5432,
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+  keepAlive: true,
+};
+
+if (DB_USE_SSL === 'true') {
+  try {
+    poolConfig.ssl = {
+      rejectUnauthorized: true,
+      ca: fs.readFileSync(path.join(__dirname, 'rds-combined-ca-bundle.pem')).toString(),
+    };
+  } catch (error) {
+    console.error("⚠️ Erro ao carregar certificado SSL:", error);
+    process.exit(1); // Encerrar se SSL é obrigatório
+  }
 }
 
+const pool = new Pool(poolConfig);
+
+// Inicialização do banco de dados e criação da tabela, se necessário
 async function init() {
-  // Configuração do pool de conexões
-  const poolConfig = {
-    host: DB_HOST,
-    user: DB_USER,
-    password: DB_PASSWORD,
-    database: DB_DATABASE,
-    port: DB_PORT || 3306,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-  };
-
-  // Se DB_USE_SSL estiver definido como 'true', ativa a conexão via SSL usando o certificado
-  if (DB_USE_SSL === 'true') {
-    poolConfig.ssl = {
-      ca: fs.readFileSync(path.join(__dirname, 'rds-combined-ca-bundle.pem'))
-    };
-  }
-
-  const pool = mysql.createPool(poolConfig);
-
-  // Testa a conexão com o banco de dados
   try {
-    const conn = await pool.getConnection();
-    console.log('Conexão com o banco de dados estabelecida com sucesso!');
-    conn.release();
+    await pool.query('SELECT NOW()');
+    console.log('✅ Conexão com o banco estabelecida!');
   } catch (err) {
-    console.error('Erro ao conectar no banco:', err);
+    console.error('❌ Erro ao conectar no banco:', err);
     process.exit(1);
   }
 
-  // Cria a tabela "atendimentos" caso ela não exista
-  await pool.execute(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS atendimentos (
-      id INT PRIMARY KEY AUTO_INCREMENT,
+      id SERIAL PRIMARY KEY,
       nome VARCHAR(255) NOT NULL,
-      email VARCHAR(255) NOT NULL,
+      email VARCHAR(255) NOT NULL UNIQUE,
       telefone VARCHAR(50),
       descricao_servico TEXT NOT NULL,
-      data_servico DATE DEFAULT (CURRENT_DATE)
+      data_servico DATE DEFAULT CURRENT_DATE
     )
   `);
-
-  // Middleware de validação para o endpoint de criação de atendimentos
-  const validateAtendimento = [
-    body('nome').trim().isLength({ min: 3 }).withMessage('Nome deve ter pelo menos 3 caracteres').escape(),
-    body('email').isEmail().withMessage('E-mail inválido').normalizeEmail(),
-    body('descricao_servico').trim().isLength({ min: 5 }).withMessage('Descrição deve ter pelo menos 5 caracteres').escape()
-  ];
-
-  // Endpoint para inserir um atendimento
-  app.post('/api/atendimentos', validateAtendimento, async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    const { nome, email, telefone, descricao_servico, data_servico } = req.body;
-    try {
-      const [result] = await pool.execute(
-        `INSERT INTO atendimentos (nome, email, telefone, descricao_servico, data_servico)
-         VALUES (?, ?, ?, ?, COALESCE(?, CURRENT_DATE))`,
-        [nome, email, telefone, descricao_servico, data_servico]
-      );
-      res.status(201).json({
-        id: result.insertId,
-        nome,
-        email,
-        telefone,
-        descricao_servico,
-        data_servico: data_servico || new Date().toISOString().split('T')[0]
-      });
-    } catch (err) {
-      console.error('Erro no banco de dados:', err);
-      res.status(500).json({ error: 'Erro interno do servidor' });
-    }
-  });
-
-  // Endpoint para recuperar todos os atendimentos
-  app.get('/api/atendimentos', async (req, res) => {
-    try {
-      const [rows] = await pool.query('SELECT * FROM atendimentos');
-      res.json(rows);
-    } catch (err) {
-      console.error('Erro ao buscar atendimentos:', err);
-      res.status(500).json({ error: 'Erro ao buscar atendimentos' });
-    }
-  });
-
-  // Rota para servir uma página de cadastro (arquivo HTML)
-  app.get('/cadastro', (req, res) => {
-    res.sendFile(path.join(__dirname, 'cadastro.html'));
-  });
-
-  // Rota raiz
-  app.get('/', (req, res) => {
-    res.send('Servidor funcionando corretamente!');
-  });
-
-  // Inicia o servidor na porta definida
-  app.listen(port, '0.0.0.0', () => {
-    console.log(`Servidor rodando na porta ${port}`);
-  });
 }
 
-// Tratamento de exceções e rejeições não tratadas
+// Middleware de validação dos dados de atendimento
+const validateAtendimento = [
+  body('nome')
+    .trim()
+    .isLength({ min: 3 })
+    .withMessage('Nome deve ter pelo menos 3 caracteres')
+    .escape(),
+  body('email')
+    .isEmail()
+    .withMessage('E-mail inválido')
+    .normalizeEmail(),
+  body('telefone')
+    .optional()
+    .trim()
+    .escape(),
+  body('descricao_servico')
+    .trim()
+    .isLength({ min: 5 })
+    .withMessage('Descrição deve ter pelo menos 5 caracteres')
+    .escape(),
+];
+
+// Rota para criar um atendimento
+app.post('/api/atendimentos', validateAtendimento, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  const { nome, email, telefone, descricao_servico, data_servico } = req.body;
+
+  try {
+    const { rows } = await pool.query(
+      `INSERT INTO atendimentos (nome, email, telefone, descricao_servico, data_servico)
+       VALUES ($1, $2, $3, $4, COALESCE($5, CURRENT_DATE))
+       RETURNING *`,
+      [nome, email, telefone, descricao_servico, data_servico]
+    );
+    res.status(201).json(rows[0]);
+  } catch (err) {
+    console.error('❌ Erro no banco de dados:', err);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+// Rota para recuperar atendimentos
+app.get('/api/atendimentos', async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM atendimentos ORDER BY id');
+    res.json(rows);
+  } catch (err) {
+    console.error('❌ Erro ao buscar atendimentos:', err);
+    res.status(500).json({ error: 'Erro ao buscar atendimentos' });
+  }
+});
+
+// Rota para servir a página de cadastro
+app.get('/cadastro', (req, res) => {
+  res.sendFile(path.join(__dirname, 'cadastro.html'));
+});
+
+// Rota raiz de verificação
+app.get('/', (req, res) => {
+  res.send('Servidor funcionando corretamente!');
+});
+
+// Middleware global de tratamento de erros
+app.use((err, req, res, next) => {
+  console.error('Erro não tratado:', err);
+  res.status(500).json({ error: 'Erro interno do servidor' });
+});
+
+// Encerramento gracioso das conexões ao receber sinais de término
+const gracefulShutdown = async () => {
+  console.log('🛑 Encerrando servidor...');
+  await pool.end();
+  console.log('✅ Conexões fechadas.');
+  process.exit(0);
+};
+
+process.on('SIGINT', gracefulShutdown);
+process.on('SIGTERM', gracefulShutdown);
+
 process.on('uncaughtException', (err) => {
-  console.error('Erro inesperado:', err);
+  console.error(' Erro inesperado:', err);
   process.exit(1);
 });
 process.on('unhandledRejection', (reason) => {
-  console.error('Rejeição não tratada:', reason);
+  console.error(' Rejeição não tratada:', reason);
   process.exit(1);
+});
+
+// Inicia o servidor e a inicialização do banco de dados
+app.listen(port, '0.0.0.0', () => {
+  console.log(` Servidor rodando na porta ${port}`);
 });
 
 init().catch(err => {
