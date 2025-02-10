@@ -33,8 +33,9 @@ app.use(limiter);
 // Verifica se as variáveis de ambiente essenciais estão definidas
 const { DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE, DB_PORT, DB_USE_SSL } = process.env;
 if (!DB_HOST || !DB_USER || !DB_PASSWORD || !DB_DATABASE) {
-  console.error("Erro: Variáveis de ambiente do banco de dados não configuradas corretamente.");
-  process.exit(1);
+  console.warn("⚠️ Atenção: Variáveis de ambiente do banco de dados podem estar incorretas.");
+}
+
 }
 
 async function init() {
@@ -106,7 +107,7 @@ async function init() {
     res.send('Servidor funcionando no Render!');
   });
 
-  app.listen(port, () => {
+  app.listen(port, '0.0.0.0', () => {
     console.log(`Servidor rodando na porta ${port}`);
   });
 }
