@@ -7,11 +7,12 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const mysql = require('mysql2/promise');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Configurar o trust proxy para funcionar corretamente no Render
+// Configurar o trust proxy para funcionar corretamente
 app.set('trust proxy', 1);
 
 // Middleware de segurança e parsing
@@ -36,9 +37,9 @@ if (!DB_HOST || !DB_USER || !DB_PASSWORD || !DB_DATABASE) {
   console.warn("⚠️ Atenção: Variáveis de ambiente do banco de dados podem estar incorretas.");
 }
 
-}
-
 async function init() {
+  const sslOptions = DB_USE_SSL === 'true' ? { rejectUnauthorized: false } : undefined;
+
   const pool = mysql.createPool({
     host: DB_HOST,
     user: DB_USER,
@@ -48,10 +49,9 @@ async function init() {
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    ssl: DB_USE_SSL === 'true' ? { rejectUnauthorized: true } : undefined,
+    ssl: sslOptions,
   });
 
-  // Para o MySQL 8.0.41, usamos DEFAULT (CURRENT_DATE) para colunas do tipo DATE
   await pool.execute(`
     CREATE TABLE IF NOT EXISTS atendimentos (
       id INT PRIMARY KEY AUTO_INCREMENT,
@@ -104,7 +104,7 @@ async function init() {
   });
 
   app.get('/', (req, res) => {
-    res.send('Servidor funcionando no Render!');
+    res.send('Servidor funcionando corretamente!');
   });
 
   app.listen(port, '0.0.0.0', () => {
