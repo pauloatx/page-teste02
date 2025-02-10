@@ -38,8 +38,6 @@ if (!DB_HOST || !DB_USER || !DB_PASSWORD || !DB_DATABASE) {
 }
 
 async function init() {
-  const sslOptions = DB_USE_SSL === 'true' ? { rejectUnauthorized: false } : undefined;
-
   const pool = mysql.createPool({
     host: DB_HOST,
     user: DB_USER,
@@ -49,8 +47,18 @@ async function init() {
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    ssl: sslOptions,
+    ssl: DB_USE_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
   });
+
+  // Verificar conexão com o banco de dados
+  try {
+    const conn = await pool.getConnection();
+    console.log('Conexão com o banco estabelecida com sucesso!');
+    conn.release();
+  } catch (err) {
+    console.error('Erro ao conectar no banco:', err);
+    process.exit(1);
+  }
 
   await pool.execute(`
     CREATE TABLE IF NOT EXISTS atendimentos (
