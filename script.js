@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
         try {
-            const resposta = await fetch("https://seu-app.onrender.com/api/atendimentos", { // URL ATUALIZADA PARA RENDERER
+            const resposta = await fetch("database.chg6gqs6crmp.us-east-2.rds.amazonaws.com", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -76,8 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
             mensagem.textContent = "Erro ao conectar ao servidor.";
             mensagem.style.color = "red";
         }
-    });
-});
+    });});
 
 
 
