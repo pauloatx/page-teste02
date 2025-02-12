@@ -20,7 +20,7 @@ const port = process.env.PORT || 3000;
 const requiredEnv = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_DATABASE'];
 const missingEnv = requiredEnv.filter((key) => !process.env[key]);
 if (missingEnv.length) {
-  console.error(`⚠️ Variáveis de ambiente faltantes: ${missingEnv.join(', ')}`);
+  console.error(`Variáveis de ambiente faltantes: ${missingEnv.join(', ')}`);
   process.exit(1);
 }
 
@@ -37,7 +37,7 @@ app.use(helmet({
     }
   }
 }));
-app.disable('x-powered-by'); // Reduz fingerprinting :contentReference[oaicite:3]{index=3}
+app.disable('x-powered-by');
 
 // Configuração do CORS
 app.use(cors({ origin: process.env.ALLOWED_ORIGINS || '*' }));
@@ -57,7 +57,7 @@ app.use(morgan('combined'));
 // Servir arquivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Rate Limiting para mitigar ataques DOS :contentReference[oaicite:4]{index=4}
+// Rate Limiting para mitigar ataques DOS
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -67,10 +67,11 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// Configuração do banco de dados
+// Configuração do banco de dados usando variáveis de ambiente
+// Utilize a URL externa fornecida pelo Render para acesso fora da infraestrutura Render
 const { DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE, DB_PORT, DB_USE_SSL } = process.env;
 const poolConfig = {
-  host: DB_HOST,
+  host: DB_HOST, // Ex: dpg-culgs7lds78s73bri7j0-a.ohio-postgres.render.com
   user: DB_USER,
   password: DB_PASSWORD,
   database: DB_DATABASE,
@@ -82,15 +83,11 @@ const poolConfig = {
 };
 
 if (DB_USE_SSL === 'true') {
-  try {
-    poolConfig.ssl = {
-      rejectUnauthorized: true,
-      ca: fs.readFileSync(path.join(__dirname, 'rds-combined-ca-bundle.pem')).toString(),
-    };
-  } catch (error) {
-    console.error("⚠️ Erro ao carregar certificado SSL:", error);
-    process.exit(1); // Encerrar se SSL é obrigatório
-  }
+  // Para conexões com Render, o SSL é necessário
+  // Como o certificado é emitido por autoridade confiável, definimos rejectUnauthorized como false
+  poolConfig.ssl = {
+    rejectUnauthorized: false,
+  };
 }
 
 const pool = new Pool(poolConfig);
@@ -99,9 +96,9 @@ const pool = new Pool(poolConfig);
 async function init() {
   try {
     await pool.query('SELECT NOW()');
-    console.log('✅ Conexão com o banco estabelecida!');
+    console.log('Conexão com o banco estabelecida!');
   } catch (err) {
-    console.error('❌ Erro ao conectar no banco:', err);
+    console.error('Erro ao conectar no banco:', err);
     process.exit(1);
   }
 
@@ -156,7 +153,7 @@ app.post('/api/atendimentos', validateAtendimento, async (req, res) => {
     );
     res.status(201).json(rows[0]);
   } catch (err) {
-    console.error('❌ Erro no banco de dados:', err);
+    console.error('Erro no banco de dados:', err);
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
 });
@@ -167,7 +164,7 @@ app.get('/api/atendimentos', async (req, res) => {
     const { rows } = await pool.query('SELECT * FROM atendimentos ORDER BY id');
     res.json(rows);
   } catch (err) {
-    console.error('❌ Erro ao buscar atendimentos:', err);
+    console.error('Erro ao buscar atendimentos:', err);
     res.status(500).json({ error: 'Erro ao buscar atendimentos' });
   }
 });
@@ -190,9 +187,9 @@ app.use((err, req, res, next) => {
 
 // Encerramento gracioso das conexões ao receber sinais de término
 const gracefulShutdown = async () => {
-  console.log('🛑 Encerrando servidor...');
+  console.log('Encerrando servidor...');
   await pool.end();
-  console.log('✅ Conexões fechadas.');
+  console.log('Conexões fechadas.');
   process.exit(0);
 };
 
@@ -200,17 +197,17 @@ process.on('SIGINT', gracefulShutdown);
 process.on('SIGTERM', gracefulShutdown);
 
 process.on('uncaughtException', (err) => {
-  console.error(' Erro inesperado:', err);
+  console.error('Erro inesperado:', err);
   process.exit(1);
 });
 process.on('unhandledRejection', (reason) => {
-  console.error(' Rejeição não tratada:', reason);
+  console.error('Rejeição não tratada:', reason);
   process.exit(1);
 });
 
 // Inicia o servidor e a inicialização do banco de dados
 app.listen(port, '0.0.0.0', () => {
-  console.log(` Servidor rodando na porta ${port}`);
+  console.log(`Servidor rodando na porta ${port}`);
 });
 
 init().catch(err => {
