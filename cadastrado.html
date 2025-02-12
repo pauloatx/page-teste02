@@ -1,33 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-        rel="stylesheet">
-    <script src="script.js"></script>
-    <link rel="shortcut icon" href="./img/logo.png" type="image/x-icon">
-    <title>Cadastro Realizado</title>
+  <meta charset="UTF-8">
+  <title>Visualização de Atendimentos</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 80%;
+      margin: 20px auto;
+    }
+    th, td {
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background: #f4f4f4;
+    }
+  </style>
 </head>
-
 <body>
-    <nav>
-        <a href="index.html">Inicio</a>
-        <a href="cadastro.html">Cadastro</a>
-        <a href="sobre.html">Sobre</a>
-    </nav>
-    <h1 style="margin-top: 10rem;">
-        Solicitação Realizada com Sucesso!
-    </h1>
-    <footer>
-        <a href="index.html"></a>
-        <span> copyright &copy; 2024 ATX Solution. Todos os direitos reservados.</span>
-    </footer>
+  <h1 style="text-align:center;">Lista de Atendimentos</h1>
+  <table id="atendimentosTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>E-mail</th>
+        <th>Telefone</th>
+        <th>Descrição do Serviço</th>
+        <th>Data do Serviço</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Os registros serão inseridos aqui -->
+    </tbody>
+  </table>
 
+  <script>
+    // Faz a requisição para a API e popula a tabela
+    fetch('https://page-teste02.onrender.com/api/atendimentos')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Erro ao buscar os atendimentos');
+        }
+        return response.json();
+      })
+      .then(data => {
+        const tbody = document.querySelector('#atendimentosTable tbody');
+        data.forEach(item => {
+          const tr = document.createElement('tr');
+
+          tr.innerHTML = `
+            <td>${item.id}</td>
+            <td>${item.nome}</td>
+            <td>${item.email}</td>
+            <td>${item.telefone || ''}</td>
+            <td>${item.descricao_servico}</td>
+            <td>${item.data_servico}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(error => {
+        console.error('Erro:', error);
+      });
+  </script>
 </body>
-
 </html>
