@@ -106,7 +106,7 @@ async function init() {
     CREATE TABLE IF NOT EXISTS atendimentos (
       id SERIAL PRIMARY KEY,
       nome VARCHAR(255) NOT NULL,
-      email VARCHAR(255) NOT NULL UNIQUE,
+      email VARCHAR(255) NOT NULL,
       telefone VARCHAR(50),
       descricao_servico TEXT NOT NULL,
       data_servico DATE DEFAULT CURRENT_DATE
