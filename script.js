@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
           try {
             // Usa o endpoint relativo da API definida no server.js
-            const resposta = await fetch("/api/atendimentos", {
+            const resposta = await fetch("https://page-teste02.onrender.com/api/atendimentos", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
