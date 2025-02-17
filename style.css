@@ -70,6 +70,13 @@ footer {
   margin-top: 2rem;
   font-size: 1.3rem;
 }
+.banner {
+  width: 500px;
+  height: auto;
+  overflow: hidden;
+  border-radius: 5px;
+}
+
 
 .web, .mobile, .dados {
   width: 200px;
